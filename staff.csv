@@ -1,0 +1,21 @@
+staff_id,name,mobile,email,floor,role,hire_date,salary_per_day,username,password_hash,status
+1,Rajesh Kumar,9876552001,rajesh.kumar@jewelry.com,Second Floor,Customer Service,2025-06-12,1000.0,RAJESH_2001,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active
+2,Priya Verma,9876552002,priya.verma@jewelry.com,Main Floor,Sales,2025-01-15,1000.0,PRIYA_2002,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active
+3,Amit Singh,9876552003,amit.singh@jewelry.com,Main Floor,Cashier,2025-09-26,1000.0,AMIT_2003,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active
+4,Neha Sharma,9876552004,neha.sharma@jewelry.com,First Floor,Sales,2025-01-14,1000.0,NEHA_2004,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active
+5,Sanjay Patel,9876552005,sanjay.patel@jewelry.com,First Floor,Cashier,2025-04-26,1000.0,SANJAY_2005,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active
+6,Deepika Das,9876552006,deepika.das@jewelry.com,Second Floor,Cashier,2025-02-10,1000.0,DEEPIKA_2006,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active
+7,Vikram Reddy,9876552007,vikram.reddy@jewelry.com,Main Floor,Cashier,2025-06-24,1000.0,VIKRAM_2007,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active
+8,Anjali Gupta,9876552008,anjali.gupta@jewelry.com,First Floor,Sales,2024-12-28,1000.0,ANJALI_2008,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active
+9,Ashok Verma,9876552009,ashok.verma@jewelry.com,Second Floor,Delivery,2025-01-23,1000.0,ASHOK_2009,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active
+10,Sheetal Kumar,9876552010,sheetal.kumar@jewelry.com,Main Floor,Customer Service,2025-04-12,1000.0,SHEETAL_2010,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active
+11,Ravi Rao,9876552011,ravi.rao@jewelry.com,First Floor,Cashier,2025-05-18,1000.0,RAVI_2011,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active
+12,Sakshi Singh,9876552012,sakshi.singh@jewelry.com,Main Floor,Delivery,2025-03-16,1000.0,SAKSHI_2012,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active
+13,Nitin Joshi,9876552013,nitin.joshi@jewelry.com,Main Floor,Sales,2025-06-28,1000.0,NITIN_2013,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active
+14,Geeta Sharma,9876552014,geeta.sharma@jewelry.com,First Floor,Sales,2025-08-20,1000.0,GEETA_2014,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active
+15,Anil Desai,9876552015,anil.desai@jewelry.com,Main Floor,Customer Service,2025-08-19,1000.0,ANIL_2015,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active
+16,Rekha Mahajan,9876552016,rekha.mahajan@jewelry.com,First Floor,Cashier,2025-05-01,1000.0,REKHA_2016,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active
+17,Manoj Kulkarni,9876552017,manoj.kulkarni@jewelry.com,First Floor,Delivery,2025-07-23,1000.0,MANOJ_2017,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active
+18,Pooja Nair,9876552018,pooja.nair@jewelry.com,Main Floor,Customer Service,2025-08-21,1000.0,POOJA_2018,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active
+19,Karan Iyer,9876552019,karan.iyer@jewelry.com,First Floor,Cashier,2025-06-15,1000.0,KARAN_2019,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active
+20,Divya Bhat,9876552020,divya.bhat@jewelry.com,Main Floor,Sales,2025-06-01,1000.0,DIVYA_2020,10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6,active

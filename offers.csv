@@ -1,0 +1,9 @@
+id,name,discount_percent,description,valid_from,valid_to,applicable_to,campaign_message
+1,Diwali Gold Special,10,Get 10% discount on all gold items during Diwali,2025-10-15,2025-11-15,gold,Celebrate Diwali with us! 🎉
+2,Platinum VIP Exclusive,15,Exclusive 15% discount for platinum members,2025-10-01,2025-12-31,platinum,You are our VIP! Enjoy extra savings ✨
+3,New Year Bonanza,20,Amazing 20% discount on ring & bracelet combos,2025-12-25,2026-01-31,all,Start 2026 fresh with new jewelry! 🎊
+4,Silver Member Special,8,Silver members get 8% off on all purchases,2025-09-01,2025-12-31,silver,Special offer for our silver members!
+5,First Purchase Discount,12,Welcome offer - 12% discount on your first purchase,2025-09-01,2025-12-31,all,New customer? Get 12% off now! 🎁
+6,Diamond Festival Sale,5,5% discount on diamond jewelry,2025-10-01,2025-11-30,all,Sparkle with diamonds this festival season! ✨
+7,Gold Member Bonus,12,12% discount for gold tier members,2025-08-01,2025-12-31,gold,Thank you for being a valued gold member!
+8,Standard Customer Offer,5,5% discount for standard tier customers,2025-09-01,2025-12-31,all,Enjoy 5% savings on your purchase!
