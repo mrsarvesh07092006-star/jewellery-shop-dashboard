@@ -1,7 +1,8 @@
 """
-💎 PREMIUM JEWELLERY SHOP MANAGEMENT SYSTEM v4.0
+💎 PREMIUM JEWELLERY SHOP MANAGEMENT SYSTEM v5.5
 Complete AI + BI System for Indian Jewellery Retail
 All Features Fully Implemented - NO "COMING SOON"
+Integration of both v4.0 and v3.5 + NEW features
 """
 
 import streamlit as st
@@ -34,6 +35,7 @@ st.markdown("""
     .success-box { background-color: #d4edda; border-left: 4px solid #28a745; padding: 15px; border-radius: 5px; }
     .warning-box { background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 5px; }
     .error-box { background-color: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; border-radius: 5px; }
+    .info-box { background-color: #d1ecf1; border-left: 4px solid #17a2b8; padding: 15px; border-radius: 5px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -59,6 +61,11 @@ USERS = {
         "role": "Sales Staff",
         "name": "Sales Staff"
     },
+    "customer": {
+        "password": hashlib.sha256("customer123".encode()).hexdigest(),
+        "role": "Customer",
+        "name": "Customer"
+    },
     "admin": {
         "password": hashlib.sha256("admin123".encode()).hexdigest(),
         "role": "Admin",
@@ -74,25 +81,31 @@ def get_accessible_pages(role):
             "👥 Customers",
             "📦 Inventory",
             "💰 Tax & Compliance",
-            "📢 Campaigns",
-            "🤖 ML Models",
-            "💎 Chit Management",
+            "👨‍💼 Staff Management",
             "⚡ Quick Actions",
             "🤖 AI Assistant"
         ],
         "Sales Staff": [
             "📊 Dashboard",
             "👥 Customers",
-            "⚡ Quick Actions"
+            "💾 Sales Record",
+            "🎁 Loyalty Program",
+            "⚡ Quick Actions",
+            "🤖 AI Assistant"
+        ],
+        "Customer": [
+            "🛍️ My Purchases",
+            "💎 My Chits",
+            "🎁 Offers & Rewards",
+            "📊 My Summary",
+            "💬 Support Chat"
         ],
         "Admin": [
             "📊 Dashboard",
             "👥 Customers",
             "📦 Inventory",
             "💰 Tax & Compliance",
-            "📢 Campaigns",
-            "🤖 ML Models",
-            "💎 Chit Management",
+            "👨‍💼 Staff Management",
             "⚡ Quick Actions",
             "🤖 AI Assistant",
             "⚙️ Settings"
@@ -109,7 +122,7 @@ def login_page():
         st.markdown("### Premium Management System for Indian Jewellery Retail")
         st.divider()
         
-        login_type = st.radio("Login As:", ["Manager", "Staff", "Admin"], horizontal=True, key="login_type")
+        login_type = st.radio("Login As:", ["Manager", "Staff", "Customer", "Admin"], horizontal=True, key="login_type")
         
         if login_type == "Manager":
             st.subheader("👨‍💼 Manager Login")
@@ -141,6 +154,21 @@ def login_page():
                 else:
                     st.error("❌ Invalid credentials")
         
+        elif login_type == "Customer":
+            st.subheader("🛍️ Customer Login")
+            username = st.text_input("Username", key="cust_user_id")
+            password = st.text_input("Password", type="password", key="cust_pass_id")
+            
+            if st.button("🔓 Login", use_container_width=True, key="cust_btn"):
+                if username == "customer" and hashlib.sha256(password.encode()).hexdigest() == USERS["customer"]["password"]:
+                    st.session_state.authenticated = True
+                    st.session_state.user_role = "Customer"
+                    st.session_state.username = username
+                    st.success("✅ Login Successful!")
+                    st.rerun()
+                else:
+                    st.error("❌ Invalid credentials")
+        
         else:  # Admin
             st.subheader("🔐 Admin Login")
             username = st.text_input("Username", key="admin_user_id")
@@ -161,11 +189,12 @@ def login_page():
         ### 📝 Demo Credentials:
         **Manager:** username: `manager` | password: `manager123`
         **Staff:** username: `staff` | password: `staff123`
+        **Customer:** username: `customer` | password: `customer123`
         **Admin:** username: `admin` | password: `admin123`
         """)
 
 # ============================================================================
-# DASHBOARD PAGE
+# DASHBOARD PAGE (MANAGER/ADMIN)
 # ============================================================================
 
 def dashboard_page():
@@ -213,7 +242,7 @@ def dashboard_page():
             'Sales': [450, 380, 320, 280, 150],
             'Revenue': ['₹22,50,000', '₹38,00,000', '₹9,60,000', '₹28,00,000', '₹7,50,000']
         })
-        st.dataframe(top_items, use_container_width=True)
+        st.dataframe(top_items, use_container_width=True, hide_index=True)
     
     with col2:
         st.subheader("👥 Customer Tier Distribution")
@@ -243,7 +272,7 @@ def customers_page():
             'Last Purchase': ['2025-12-10', '2025-12-09', '2025-12-05', '2025-12-08', '2025-11-25']
         })
         
-        st.dataframe(customers_df, use_container_width=True, key="cust_df")
+        st.dataframe(customers_df, use_container_width=True, hide_index=True)
     
     with tab2:
         st.subheader("Add New Customer")
@@ -279,7 +308,7 @@ def customers_page():
             'Discount': ['1%', '0.5%', '0.33%', '0.2%'],
             'Redeem Rate': ['100 pts = ₹100', '100 pts = ₹50', '100 pts = ₹33', '100 pts = ₹20']
         })
-        st.dataframe(loyalty_df, use_container_width=True)
+        st.dataframe(loyalty_df, use_container_width=True, hide_index=True)
     
     with tab4:
         st.subheader("📊 Customer Analytics")
@@ -321,10 +350,10 @@ def inventory_page():
             'Quantity': [45, 120, 15, 8, 32],
             'Unit Price': ['₹15,000', '₹2,000', '₹50,000', '₹75,000', '₹22,000'],
             'Total Value': ['₹6,75,000', '₹2,40,000', '₹7,50,000', '₹6,00,000', '₹7,04,000'],
-            'Status': ['In Stock', 'In Stock', 'Low Stock', 'Low Stock', 'In Stock']
+            'Status': ['✅ In Stock', '✅ In Stock', '⚠️ Low Stock', '🔴 Critical', '✅ In Stock']
         })
         
-        st.dataframe(inventory_df, use_container_width=True)
+        st.dataframe(inventory_df, use_container_width=True, hide_index=True)
     
     with tab2:
         st.subheader("Add New Item")
@@ -348,9 +377,9 @@ def inventory_page():
         st.subheader("⚠️ Low Stock Alerts")
         st.markdown("""
         <div class='warning-box'>
-        <strong>⚠️ Low Stock Items:</strong>
-        • Diamond Pendant (GLD003) - Only 15 units
-        • Platinum Ring (PLT004) - Only 8 units
+        <strong>⚠️ Low Stock Items:</strong><br>
+        • Diamond Pendant (GLD003) - Only 15 units<br>
+        • Platinum Ring (PLT004) - Only 8 units<br>
         <strong>Action Required:</strong> Order more stock to avoid stockouts
         </div>
         """, unsafe_allow_html=True)
@@ -362,7 +391,7 @@ def inventory_page():
             'Shortage': [5, 7],
             'Status': ['⚠️ Warning', '🔴 Critical']
         })
-        st.dataframe(low_stock, use_container_width=True)
+        st.dataframe(low_stock, use_container_width=True, hide_index=True)
     
     with tab4:
         st.subheader("📈 Inventory Analytics")
@@ -415,7 +444,7 @@ def tax_compliance_page():
             'GST Collected': ['₹7,56,000', '₹8,10,000', '₹15,66,000'],
             'GST Payable': ['₹6,20,000', '₹6,50,000', '₹12,70,000']
         })
-        st.dataframe(tax_df, use_container_width=True)
+        st.dataframe(tax_df, use_container_width=True, hide_index=True)
     
     with tab2:
         st.subheader("GST Reports")
@@ -430,7 +459,7 @@ def tax_compliance_page():
                 'Amount': ['₹50,000', '₹75,000', '₹60,000'],
                 'GST': ['₹9,000', '₹13,500', '₹10,800']
             })
-            st.dataframe(gstr1, use_container_width=True)
+            st.dataframe(gstr1, use_container_width=True, hide_index=True)
         
         with col2:
             st.markdown("**GSTR-2 (Inward Supplies)**")
@@ -440,7 +469,7 @@ def tax_compliance_page():
                 'Vendor': ['Gold Supplier Inc', 'Silver Corp', 'Diamond Ltd'],
                 'Amount': ['₹2,00,000', '₹1,50,000', '₹1,20,000']
             })
-            st.dataframe(gstr2, use_container_width=True)
+            st.dataframe(gstr2, use_container_width=True, hide_index=True)
     
     with tab3:
         st.subheader("Invoice Management")
@@ -451,10 +480,10 @@ def tax_compliance_page():
             'Customer': ['Rajesh Patel', 'Priya Singh', 'Amit Kumar', 'Neha Sharma'],
             'Amount': ['₹50,000', '₹75,000', '₹60,000', '₹85,000'],
             'GST': ['₹9,000', '₹13,500', '₹10,800', '₹15,300'],
-            'Status': ['Paid', 'Paid', 'Pending', 'Pending']
+            'Status': ['✅ Paid', '✅ Paid', '⏳ Pending', '⏳ Pending']
         })
         
-        st.dataframe(invoices, use_container_width=True)
+        st.dataframe(invoices, use_container_width=True, hide_index=True)
         
         st.markdown("**Create New Invoice**")
         col1, col2 = st.columns(2)
@@ -486,147 +515,144 @@ def tax_compliance_page():
             st.markdown(f"{status} **{item}:** {details}")
 
 # ============================================================================
-# CAMPAIGNS PAGE
+# STAFF MANAGEMENT PAGE (NEW)
 # ============================================================================
 
-def campaigns_page():
-    st.markdown("<h2 class='main-title'>📢 Campaigns</h2>", unsafe_allow_html=True)
+def staff_management_page():
+    st.markdown("<h2 class='main-title'>👨‍💼 Staff Management</h2>", unsafe_allow_html=True)
     
-    tab1, tab2, tab3 = st.tabs(["📊 Active Campaigns", "➕ Create Campaign", "📈 Campaign Performance"])
+    tab1, tab2, tab3, tab4 = st.tabs(["📋 Staff Directory", "➕ Add Staff", "📊 Performance", "💰 Salary & Bonus"])
     
     with tab1:
-        st.subheader("Active Campaigns")
+        st.subheader("Staff Directory")
         
-        campaigns = pd.DataFrame({
-            'Campaign': ['Diwali Sale 2025', 'Wedding Season Special', 'New Year Discount', 'Clearance Sale'],
-            'Type': ['Seasonal', 'Festival', 'Seasonal', 'Clearance'],
-            'Discount': ['20%', '15%', '10%', '30%'],
-            'Start Date': ['2025-10-15', '2025-11-01', '2025-12-20', '2025-12-01'],
-            'End Date': ['2025-11-15', '2025-12-31', '2026-01-31', '2025-12-31'],
-            'Budget': ['₹2,00,000', '₹1,50,000', '₹1,00,000', '₹50,000'],
-            'Status': ['Active', 'Active', 'Scheduled', 'Active']
+        staff_df = pd.DataFrame({
+            'ID': ['S001', 'S002', 'S003', 'S004', 'S005'],
+            'Name': ['Amit Verma', 'Priya Kapoor', 'Rajesh Kumar', 'Neha Singh', 'Vikram Patel'],
+            'Position': ['Sales Executive', 'Sales Associate', 'Manager', 'Sales Executive', 'Cashier'],
+            'Floor': ['Floor 1', 'Floor 1', 'Floor 2', 'Floor 2', 'Ground'],
+            'Joining Date': ['2024-01-15', '2024-03-20', '2023-06-10', '2024-05-01', '2024-02-28'],
+            'Status': ['✅ Active', '✅ Active', '✅ Active', '✅ Active', '✅ Active']
         })
         
-        st.dataframe(campaigns, use_container_width=True)
+        st.dataframe(staff_df, use_container_width=True, hide_index=True)
     
     with tab2:
-        st.subheader("Create New Campaign")
+        st.subheader("Add New Staff Member")
         
         col1, col2 = st.columns(2)
         with col1:
-            campaign_name = st.text_input("Campaign Name", key="camp_name")
-            campaign_type = st.selectbox("Type", ["Seasonal", "Festival", "Clearance", "Bundle", "VIP"], key="camp_type")
-            discount = st.slider("Discount (%)", 0, 100, 20, key="camp_discount")
+            name = st.text_input("Full Name", key="staff_name")
+            position = st.selectbox("Position", ["Sales Executive", "Sales Associate", "Manager", "Cashier"], key="staff_pos")
+            joining_date = st.date_input("Joining Date", key="staff_join")
         
         with col2:
-            start_date = st.date_input("Start Date", key="camp_start")
-            end_date = st.date_input("End Date", key="camp_end")
-            budget = st.number_input("Budget (₹)", min_value=1000, key="camp_budget")
+            email = st.text_input("Email", key="staff_email")
+            phone = st.text_input("Phone", key="staff_phone")
+            floor = st.selectbox("Floor Assignment", ["Ground", "Floor 1", "Floor 2"], key="staff_floor")
         
-        description = st.text_area("Campaign Description", key="camp_desc")
-        
-        if st.button("✅ Create Campaign", use_container_width=True, key="create_camp_btn"):
-            st.success("✅ Campaign created successfully!")
+        if st.button("✅ Add Staff", use_container_width=True, key="add_staff_btn"):
+            st.success("✅ Staff member added successfully!")
             st.balloons()
     
     with tab3:
-        st.subheader("📈 Campaign Performance")
+        st.subheader("📊 Staff Performance")
         
         col1, col2 = st.columns(2)
         
         with col1:
-            fig = px.bar(
-                x=['Diwali Sale', 'Wedding Special', 'New Year', 'Clearance'],
-                y=[45000, 32000, 18000, 25000],
-                title="Campaign Revenue"
-            )
-            st.plotly_chart(fig, use_container_width=True)
+            st.markdown("**Monthly Sales by Staff**")
+            perf_df = pd.DataFrame({
+                'Staff': ['Amit Verma', 'Priya Kapoor', 'Rajesh Kumar', 'Neha Singh', 'Vikram Patel'],
+                'Sales (₹)': ['12,50,000', '10,80,000', '15,60,000', '9,80,000', '8,40,000'],
+                'Target': ['₹12,00,000', '₹10,00,000', '₹15,00,000', '₹9,50,000', '₹8,00,000'],
+                'Achievement': ['104%', '108%', '104%', '103%', '105%']
+            })
+            st.dataframe(perf_df, use_container_width=True, hide_index=True)
         
         with col2:
+            fig = px.bar(
+                x=['Amit', 'Priya', 'Rajesh', 'Neha', 'Vikram'],
+                y=[12.5, 10.8, 15.6, 9.8, 8.4],
+                title="Staff Sales Performance (in Lakhs)"
+            )
+            st.plotly_chart(fig, use_container_width=True)
+    
+    with tab4:
+        st.subheader("💰 Salary & Bonus Management")
+        
+        salary_df = pd.DataFrame({
+            'Staff': ['Amit Verma', 'Priya Kapoor', 'Rajesh Kumar', 'Neha Singh', 'Vikram Patel'],
+            'Base Salary': ['₹25,000', '₹22,000', '₹35,000', '₹20,000', '₹18,000'],
+            'Allowance': ['₹5,000', '₹4,000', '₹7,000', '₹3,500', '₹3,000'],
+            'Bonus (Dec)': ['₹10,000', '₹8,500', '₹12,000', '₹7,500', '₹6,500'],
+            'Total (Dec)': ['₹40,000', '₹34,500', '₹54,000', '₹31,000', '₹27,500']
+        })
+        
+        st.dataframe(salary_df, use_container_width=True, hide_index=True)
+
+# ============================================================================
+# SALES RECORD PAGE (STAFF)
+# ============================================================================
+
+def sales_record_page():
+    st.markdown("<h2 class='main-title'>💾 Sales Record</h2>", unsafe_allow_html=True)
+    
+    tab1, tab2, tab3 = st.tabs(["📝 Record Sale", "📊 My Sales", "📈 Sales Trend"])
+    
+    with tab1:
+        st.subheader("Record New Sale")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            customer_name = st.text_input("Customer Name", key="sale_cust")
+            item = st.selectbox("Item", ["Gold Ring", "Diamond Pendant", "Silver Bracelet", "Platinum Ring"], key="sale_item")
+            quantity = st.number_input("Quantity", min_value=1, key="sale_qty")
+        
+        with col2:
+            price = st.number_input("Price (₹)", min_value=100, key="sale_price")
+            payment_mode = st.selectbox("Payment", ["Cash", "Card", "Cheque", "UPI"], key="sale_payment")
+            sale_date = st.date_input("Sale Date", key="sale_date")
+        
+        if st.button("✅ Record Sale", use_container_width=True, key="record_sale_btn"):
+            total = quantity * price
+            st.success(f"✅ Sale recorded! Total: ₹{total:,}")
+            st.balloons()
+    
+    with tab2:
+        st.subheader("My Sales Record")
+        
+        my_sales = pd.DataFrame({
+            'Date': ['2025-12-10', '2025-12-09', '2025-12-08', '2025-12-07'],
+            'Customer': ['Rajesh Patel', 'Priya Singh', 'Amit Kumar', 'Neha Sharma'],
+            'Item': ['Gold Ring', 'Diamond Pendant', 'Silver Bracelet', 'Gold Necklace'],
+            'Qty': [1, 1, 2, 1],
+            'Amount': ['₹15,000', '₹50,000', '₹4,000', '₹22,000'],
+            'Payment': ['Cash', 'Card', 'UPI', 'Cash']
+        })
+        
+        st.dataframe(my_sales, use_container_width=True, hide_index=True)
+        st.metric("Total This Month", "₹12,50,000", "+₹50,000")
+    
+    with tab3:
+        st.subheader("📈 My Sales Trend")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
             fig = px.line(
                 x=['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                y=[10000, 15000, 12000, 8000],
-                title="Weekly Sales Trend",
+                y=[2.8, 3.2, 3.1, 2.9],
+                title="Weekly Sales (in Lakhs)",
                 markers=True
             )
             st.plotly_chart(fig, use_container_width=True)
-
-# ============================================================================
-# CHIT MANAGEMENT PAGE
-# ============================================================================
-
-def chit_management_page():
-    st.markdown("<h2 class='main-title'>💎 Chit Management</h2>", unsafe_allow_html=True)
-    
-    tab1, tab2, tab3, tab4 = st.tabs(["📋 Active Chits", "➕ Create Chit", "💰 Chit Payments", "📊 Chit Analytics"])
-    
-    with tab1:
-        st.subheader("Active Chits")
-        
-        chits = pd.DataFrame({
-            'Chit ID': ['CHT001', 'CHT002', 'CHT003', 'CHT004'],
-            'Chit Name': ['Gold 12-Month', 'Silver 6-Month', 'Diamond Savings', 'Platinum Plus'],
-            'Chit Value': ['₹1,00,000', '₹50,000', '₹2,00,000', '₹3,00,000'],
-            'Members': ['12', '6', '20', '10'],
-            'Monthly Installment': ['₹8,500', '₹8,500', '₹10,000', '₹30,000'],
-            'Status': ['Active', 'Active', 'Active', 'Closing'],
-            'Start Date': ['2025-01-01', '2025-07-01', '2025-08-01', '2025-02-01']
-        })
-        
-        st.dataframe(chits, use_container_width=True)
-    
-    with tab2:
-        st.subheader("Create New Chit")
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            chit_name = st.text_input("Chit Name", key="chit_name")
-            chit_value = st.number_input("Chit Value (₹)", min_value=10000, key="chit_value")
-            num_members = st.number_input("Number of Members", min_value=1, max_value=100, key="chit_members")
-        
-        with col2:
-            duration = st.selectbox("Duration", ["3 Months", "6 Months", "12 Months", "24 Months"], key="chit_duration")
-            chit_type = st.selectbox("Type", ["Regular", "Premium", "Diamond", "Platinum"], key="chit_type")
-            start_date = st.date_input("Start Date", key="chit_start")
-        
-        monthly_installment = (st.number_input("Monthly Installment (₹)", min_value=100, key="chit_monthly"))
-        
-        if st.button("✅ Create Chit", use_container_width=True, key="create_chit_btn"):
-            st.success("✅ Chit created successfully!")
-            st.balloons()
-    
-    with tab3:
-        st.subheader("💰 Payment Tracking")
-        
-        payments = pd.DataFrame({
-            'Chit ID': ['CHT001', 'CHT001', 'CHT002', 'CHT002', 'CHT003'],
-            'Member': ['Rajesh Patel', 'Priya Singh', 'Amit Kumar', 'Neha Sharma', 'Vikram Gupta'],
-            'Month': ['Dec 2025', 'Dec 2025', 'Dec 2025', 'Dec 2025', 'Dec 2025'],
-            'Amount': ['₹8,500', '₹8,500', '₹8,500', '₹8,500', '₹10,000'],
-            'Status': ['Paid', 'Pending', 'Paid', 'Pending', 'Paid'],
-            'Payment Date': ['2025-12-05', 'Pending', '2025-12-08', 'Pending', '2025-12-10']
-        })
-        
-        st.dataframe(payments, use_container_width=True)
-    
-    with tab4:
-        st.subheader("📊 Chit Analytics")
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            fig = px.pie(
-                values=[12, 6, 20, 10],
-                names=['Gold 12M', 'Silver 6M', 'Diamond', 'Platinum'],
-                title="Members by Chit"
-            )
-            st.plotly_chart(fig, use_container_width=True)
         
         with col2:
             fig = px.bar(
-                x=['CHT001', 'CHT002', 'CHT003', 'CHT004'],
-                y=[100, 50, 200, 300],
-                title="Chit Value (in Lakhs)"
+                x=['Target', 'Actual'],
+                y=[12, 12.5],
+                title="Target vs Actual (in Lakhs)"
             )
             st.plotly_chart(fig, use_container_width=True)
 
@@ -668,13 +694,21 @@ def quick_actions_page():
             st.success("✅ Loyalty points calculator opened!")
 
 # ============================================================================
-# AI ASSISTANT PAGE
+# AI ASSISTANT PAGE (ADVANCED CHATBOT)
 # ============================================================================
 
 def ai_assistant_page():
     st.markdown("<h2 class='main-title'>🤖 AI Assistant</h2>", unsafe_allow_html=True)
     
-    st.subheader("💬 Chat with AI")
+    st.subheader("💬 Chat with AI - 8 Knowledge Categories")
+    
+    st.markdown("""
+    <div class='info-box'>
+    <strong>📚 AI understands 8 categories:</strong><br>
+    1. 📦 Stock & Inventory | 2. 💰 Sales & Revenue | 3. 👥 Customers | 4. 💎 Chits<br>
+    5. 👨‍💼 Staff & Team | 6. 💵 Tax & Compliance | 7. 📢 Campaigns | 8. 📈 Forecasting
+    </div>
+    """, unsafe_allow_html=True)
     
     # Initialize chat history
     if "messages" not in st.session_state:
@@ -686,23 +720,34 @@ def ai_assistant_page():
             st.markdown(message["content"])
     
     # Chat input
-    if prompt := st.chat_input("Ask me anything about your business..."):
+    if prompt := st.chat_input("Ask me about stock, sales, customers, chits, staff, tax, campaigns, or forecasting..."):
         st.session_state.messages.append({"role": "user", "content": prompt})
         
         with st.chat_message("user"):
             st.markdown(prompt)
         
-        # AI response (simulated)
+        # AI Response with 8 categories
         ai_responses = {
-            "stock": "Your current stock value is ₹45,00,000. Low stock items: Diamond Pendant (15 units), Platinum Ring (8 units).",
-            "sales": "Today's sales: ₹1,85,000. Monthly sales: ₹45,00,000. Top item: Gold Ring (₹22,50,000).",
-            "customer": "Total customers: 1,250. Premium: 250, Gold: 450, Silver: 350, Standard: 200. Average customer value: ₹36,000.",
-            "chit": "Active chits: 85. Total value: ₹65,00,000. Members: 127. Monthly collection: ₹9,50,000.",
-            "tax": "GST payable this month: ₹6,50,000. GSTR-1 filed. All compliance up to date."
+            "stock": "📦 **Stock & Inventory Status:**\n\n• Gold items: 77 units (₹13.79L value)\n• Silver items: 120 units (₹2.40L value)\n• Diamond items: 15 units (₹7.50L value) - ⚠️ Low stock!\n• Platinum items: 8 units (₹6.00L value) - 🔴 Critical!\n\n**Action:** Reorder Diamond & Platinum items immediately.",
+            
+            "sales": "💰 **Sales & Revenue Report:**\n\n• Today's sales: ₹1,85,000\n• Weekly sales: ₹12,50,000\n• Monthly sales: ₹45,00,000 (+₹5,00,000)\n• Top item: Gold Ring (₹22,50,000)\n• Second: Diamond Pendant (₹38,00,000)\n\n**Trend:** ✅ Sales growing 12% month-over-month",
+            
+            "customer": "👥 **Customer Analytics:**\n\n• Total customers: 1,250 (+45 this month)\n• Premium tier: 250 (20%)\n• Gold tier: 450 (36%)\n• Silver tier: 350 (28%)\n• Standard tier: 200 (16%)\n\n**Average customer value:** ₹36,000\n**Loyalty program:** 92% enrolled",
+            
+            "chit": "💎 **Chit Management Status:**\n\n• Active chits: 85 (+12 this month)\n• Total members: 127\n• Total value: ₹65,00,000\n• Monthly collection: ₹9,50,000\n• Payment status: 94% on-time payments\n\n**Upcoming payouts:** 12 chits this month",
+            
+            "staff": "👨‍💼 **Staff & Team Performance:**\n\n**Top Performers:**\n1. Rajesh Kumar - ₹15,60,000 (104% target)\n2. Amit Verma - ₹12,50,000 (104% target)\n3. Priya Kapoor - ₹10,80,000 (108% target)\n\n**Average team sales:** ₹11,42,000 per person\n**Team bonus pool:** ₹44,000 (Dec)",
+            
+            "tax": "💵 **Tax & Compliance Status:**\n\n• GST filing: ✅ November filed on time\n• Current GST payable: ₹6,50,000\n• YTD tax collected: ₹15,66,000\n• Next filing: 20th December\n• Compliance: ✅ 7/8 items complete\n\n**Pending:** Labor license renewal (due Jan 15)",
+            
+            "campaign": "📢 **Campaign Performance:**\n\n**Active Campaigns:**\n1. Diwali Sale 2025 - ₹45,00,000 revenue (20% discount)\n2. Wedding Special - ₹32,00,000 revenue (15% discount)\n3. Clearance Sale - ₹25,00,000 revenue (30% discount)\n\n**Total campaign revenue:** ₹1,02,00,000\n**ROI:** 285% average",
+            
+            "forecast": "📈 **Demand Forecasting & Trends:**\n\n**Predicted Demand (Next 30 Days):**\n• Gold items: ↑ 48 units (current: 45)\n• Silver items: ↑ 135 units (current: 120)\n• Diamond items: ↑ 18 units (current: 15)\n• Platinum items: ↑ 10 units (current: 8)\n\n**Seasonal trend:** ↑ Upward (Wedding season approaching)\n**Confidence:** 92%"
         }
         
         # Simple keyword matching for AI response
-        response = "I'm here to help! Ask me about stock, sales, customers, chits, or tax matters."
+        response = "Hello! I'm your AI business assistant. I can help with:\n\n📦 **Stock & Inventory** | 💰 **Sales & Revenue** | 👥 **Customers** | 💎 **Chits** | 👨‍💼 **Staff** | 💵 **Tax** | 📢 **Campaigns** | 📈 **Forecasting**\n\nTry asking about any of these topics!"
+        
         for keyword, ans in ai_responses.items():
             if keyword in prompt.lower():
                 response = ans
@@ -714,138 +759,191 @@ def ai_assistant_page():
             st.markdown(response)
 
 # ============================================================================
-# SETTINGS PAGE (ADMIN ONLY)
+# CUSTOMER PORTAL PAGES (NEW)
+# ============================================================================
+
+def customer_purchases_page():
+    st.markdown("<h2 class='main-title'>🛍️ My Purchases</h2>", unsafe_allow_html=True)
+    
+    purchases_df = pd.DataFrame({
+        'Date': ['2025-12-10', '2025-12-05', '2025-11-28', '2025-11-15'],
+        'Item': ['Gold Ring', 'Diamond Pendant', 'Silver Bracelet', 'Gold Necklace'],
+        'Amount': ['₹15,000', '₹50,000', '₹2,000', '₹22,000'],
+        'Points Earned': ['150', '500', '20', '220'],
+        'Status': ['✅ Delivered', '✅ Delivered', '✅ Delivered', '✅ Delivered']
+    })
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Total Spent", "₹89,000")
+    with col2:
+        st.metric("Loyalty Points", "890")
+    
+    st.subheader("Purchase History")
+    st.dataframe(purchases_df, use_container_width=True, hide_index=True)
+
+def customer_chits_page():
+    st.markdown("<h2 class='main-title'>💎 My Chits</h2>", unsafe_allow_html=True)
+    
+    chits_df = pd.DataFrame({
+        'Chit Name': ['Gold 12-Month', 'Diamond Savings'],
+        'Amount': ['₹1,00,000', '₹2,00,000'],
+        'Monthly': ['₹8,500', '₹10,000'],
+        'Paid': ['6/12', '3/20'],
+        'Remaining': ['₹25,500', '₹170,000'],
+        'Status': ['✅ Active', '✅ Active']
+    })
+    
+    st.subheader("Your Active Chits")
+    st.dataframe(chits_df, use_container_width=True, hide_index=True)
+    
+    st.subheader("Next Payment Due")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.info("Gold 12-Month Chit\n**Due:** Dec 15, 2025\n**Amount:** ₹8,500")
+    with col2:
+        st.info("Diamond Savings Chit\n**Due:** Dec 20, 2025\n**Amount:** ₹10,000")
+
+def customer_offers_page():
+    st.markdown("<h2 class='main-title'>🎁 Offers & Rewards</h2>", unsafe_home_html=True)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        ### Your Tier: GOLD
+        - Birthday Month Discount: 15%
+        - Birthday Gift: ₹2,000 voucher
+        - Exclusive Early Access: New collections
+        - Free Maintenance: 1 item/year
+        """)
+    
+    with col2:
+        st.markdown("""
+        ### Active Offers
+        - Wedding Season Special: 15% OFF
+        - Loyalty Redemption: 100 pts = ₹50
+        - Referral Bonus: ₹500 per friend
+        - Clearance Sale: 30% OFF selected items
+        """)
+
+def customer_summary_page():
+    st.markdown("<h2 class='main-title'>📊 My Account Summary</h2>", unsafe_home_html=True)
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Total Purchased", "₹89,000")
+    with col2:
+        st.metric("Loyalty Points", "890")
+    with col3:
+        st.metric("Active Chits", "2")
+    with col4:
+        st.metric("Customer Tier", "Gold 🥈")
+    
+    st.divider()
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("Quick Links")
+        if st.button("📦 Browse Items", use_container_width=True):
+            st.success("Opening store catalog...")
+        if st.button("💳 Apply for Chit", use_container_width=True):
+            st.success("Opening chit application...")
+    
+    with col2:
+        st.subheader("Recent Activity")
+        activity = pd.DataFrame({
+            'Date': ['Today', 'Dec 5', 'Nov 28'],
+            'Activity': ['Earned 150 points', 'Purchased pendant', 'Chit payment done']
+        })
+        st.dataframe(activity, use_container_width=True, hide_index=True)
+
+def customer_support_chat():
+    st.markdown("<h2 class='main-title'>💬 Support Chat</h2>", unsafe_home_html=True)
+    
+    st.markdown("Chat with our AI support assistant:")
+    
+    if "customer_messages" not in st.session_state:
+        st.session_state.customer_messages = []
+    
+    for message in st.session_state.customer_messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+    
+    if prompt := st.chat_input("Ask about your purchases, chits, loyalty, or offers..."):
+        st.session_state.customer_messages.append({"role": "user", "content": prompt})
+        
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        
+        # Support responses
+        support_responses = {
+            "purchase": "📦 Your recent purchases are delivered. You earned 890 loyalty points! Use them to get discounts.",
+            "chit": "💎 You have 2 active chits worth ₹3,00,000. Next payment due Dec 15.",
+            "loyalty": "🎁 You're in Gold tier! Enjoy 15% birthday discount and free maintenance on 1 item/year.",
+            "offer": "🎉 Active offers: 15% wedding discount, 30% clearance sale, ₹500 referral bonus!",
+            "delivery": "📫 All your items are delivered. Track status in My Purchases.",
+            "points": "⭐ You have 890 loyalty points. 100 points = ₹50 discount!",
+            "help": "I can help with: Purchases, Chits, Loyalty, Offers, Delivery, or Points!"
+        }
+        
+        response = "Thank you for contacting us! How can I help you today?"
+        for keyword, ans in support_responses.items():
+            if keyword in prompt.lower():
+                response = ans
+                break
+        
+        st.session_state.customer_messages.append({"role": "assistant", "content": response})
+        
+        with st.chat_message("assistant"):
+            st.markdown(response)
+
+# ============================================================================
+# SETTINGS PAGE (ADMIN)
 # ============================================================================
 
 def settings_page():
-    st.markdown("<h2 class='main-title'>⚙️ Settings</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 class='main-title'>⚙️ Settings</h2>", unsafe_home_html=True)
     
-    tab1, tab2, tab3, tab4 = st.tabs(["👥 Users", "🏪 Store Settings", "🔔 Notifications", "📊 System Logs"])
+    tab1, tab2, tab3, tab4 = st.tabs(["👥 Users", "🏪 Store", "🔔 Notifications", "📊 Logs"])
     
     with tab1:
         st.subheader("User Management")
         
         users = pd.DataFrame({
-            'Username': ['manager', 'staff', 'admin'],
-            'Role': ['Manager', 'Sales Staff', 'Admin'],
-            'Last Login': ['2025-12-11', '2025-12-11', '2025-12-11'],
-            'Status': ['Active', 'Active', 'Active']
+            'Username': ['manager', 'staff', 'customer', 'admin'],
+            'Role': ['Manager', 'Sales Staff', 'Customer', 'Admin'],
+            'Last Login': ['2025-12-11', '2025-12-11', '2025-12-11', '2025-12-11'],
+            'Status': ['✅ Active', '✅ Active', '✅ Active', '✅ Active']
         })
         
-        st.dataframe(users, use_container_width=True)
-        
-        st.divider()
-        st.subheader("Add New User")
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            new_user = st.text_input("Username", key="new_user_id")
-            new_password = st.text_input("Password", type="password", key="new_pass_id")
-        
-        with col2:
-            new_role = st.selectbox("Role", ["Manager", "Sales Staff", "Admin"], key="new_role_id")
-            email = st.text_input("Email", key="new_email_id")
-        
-        if st.button("➕ Add User", use_container_width=True, key="add_user_btn"):
-            st.success("✅ User added successfully!")
+        st.dataframe(users, use_container_width=True, hide_index=True)
     
     with tab2:
         st.subheader("Store Settings")
-        
-        store_settings = {
-            "Store Name": st.text_input("Store Name", "Jewellery Shop Premium", key="store_name"),
-            "Owner": st.text_input("Owner Name", "Rajesh Patel", key="owner_name"),
-            "Email": st.text_input("Email", "shop@jewellery.com", key="store_email"),
-            "Phone": st.text_input("Phone", "+91-9876543210", key="store_phone"),
-            "Address": st.text_area("Address", "123 Gold Street, Mumbai", key="store_addr"),
-            "GSTIN": st.text_input("GSTIN", "27ABCXYZ123", key="gstin"),
-        }
-        
-        if st.button("💾 Save Settings", use_container_width=True, key="save_settings_btn"):
-            st.success("✅ Settings saved successfully!")
+        st.text_input("Store Name", "Jewellery Shop Premium", disabled=True)
+        st.text_input("Owner", "Rajesh Patel", disabled=True)
+        st.text_input("GSTIN", "27ABCXYZ123", disabled=True)
+        st.success("✅ All settings saved")
     
     with tab3:
-        st.subheader("Notification Settings")
-        
-        st.toggle("Email Alerts", value=True, key="email_alerts")
-        st.toggle("SMS Alerts", value=True, key="sms_alerts")
-        st.toggle("Low Stock Notifications", value=True, key="low_stock_notify")
-        st.toggle("Daily Reports", value=True, key="daily_reports")
-        st.toggle("Monthly Summaries", value=True, key="monthly_summaries")
-        
-        if st.button("💾 Save Preferences", use_container_width=True, key="save_notify_btn"):
-            st.success("✅ Preferences saved successfully!")
+        st.subheader("Notification Preferences")
+        st.toggle("Email Alerts", value=True)
+        st.toggle("SMS Alerts", value=True)
+        st.toggle("Low Stock Notifications", value=True)
+        st.toggle("Daily Reports", value=True)
     
     with tab4:
         st.subheader("System Logs")
-        
         logs = pd.DataFrame({
-            'Timestamp': ['2025-12-11 10:30', '2025-12-11 10:25', '2025-12-11 10:20', '2025-12-11 10:15'],
-            'User': ['admin', 'manager', 'staff', 'admin'],
-            'Action': ['Added new user', 'Generated report', 'Created sale', 'Updated inventory'],
-            'Status': ['Success', 'Success', 'Success', 'Success']
+            'Timestamp': ['2025-12-11 10:30', '2025-12-11 10:25', '2025-12-11 10:20'],
+            'User': ['admin', 'manager', 'staff'],
+            'Action': ['Logged in', 'Generated report', 'Recorded sale'],
+            'Status': ['✅ Success', '✅ Success', '✅ Success']
         })
-        
-        st.dataframe(logs, use_container_width=True)
-
-# ============================================================================
-# ML MODELS PAGE
-# ============================================================================
-
-def ml_models_page():
-    st.markdown("<h2 class='main-title'>🤖 ML Models</h2>", unsafe_allow_html=True)
-    
-    tab1, tab2, tab3 = st.tabs(["📈 Demand Forecasting", "💎 Price Optimization", "👥 Customer Segmentation"])
-    
-    with tab1:
-        st.subheader("Demand Forecasting")
-        st.info("AI-powered demand prediction for next 30 days")
-        
-        forecast_data = pd.DataFrame({
-            'Product': ['Gold Ring', 'Silver Bracelet', 'Diamond Pendant', 'Platinum Ring'],
-            'Current Demand': [45, 120, 15, 8],
-            'Predicted Demand (30 days)': [48, 135, 18, 10],
-            'Confidence': ['92%', '88%', '85%', '87%'],
-            'Action': ['Maintain', 'Increase', 'Reorder', 'Reorder']
-        })
-        
-        st.dataframe(forecast_data, use_container_width=True)
-    
-    with tab2:
-        st.subheader("Price Optimization")
-        st.info("AI-recommended prices based on demand and competition")
-        
-        price_data = pd.DataFrame({
-            'Product': ['Gold Ring', 'Silver Bracelet', 'Diamond Pendant', 'Platinum Ring'],
-            'Current Price': ['₹15,000', '₹2,000', '₹50,000', '₹75,000'],
-            'Recommended Price': ['₹15,500', '₹1,950', '₹52,000', '₹77,500'],
-            'Expected Revenue Impact': ['+8.5%', '-2.3%', '+4.2%', '+3.5%'],
-            'Recommendation': ['Increase', 'Decrease', 'Increase', 'Increase']
-        })
-        
-        st.dataframe(price_data, use_container_width=True)
-    
-    with tab3:
-        st.subheader("Customer Segmentation")
-        st.info("AI-driven customer grouping for targeted marketing")
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            fig = px.pie(
-                values=[250, 450, 350, 200],
-                names=['VIP (₹5L+)', 'Premium (₹2-5L)', 'Regular (₹50K-2L)', 'New (<₹50K)'],
-                title="Customer Segments by Value"
-            )
-            st.plotly_chart(fig, use_container_width=True)
-        
-        with col2:
-            fig = px.bar(
-                x=['VIP', 'Premium', 'Regular', 'New'],
-                y=[1800, 1200, 600, 150],
-                title="Average Purchase Frequency (days)",
-            )
-            st.plotly_chart(fig, use_container_width=True)
+        st.dataframe(logs, use_container_width=True, hide_index=True)
 
 # ============================================================================
 # MAIN APPLICATION
@@ -857,7 +955,7 @@ def main():
     else:
         # Sidebar navigation
         with st.sidebar:
-            st.markdown(f"<h3>Welcome, {st.session_state.username}! ({st.session_state.user_role})</h3>", unsafe_allow_html=True)
+            st.markdown(f"<h3>Welcome, {st.session_state.username}! ({st.session_state.user_role})</h3>", unsafe_home_html=True)
             st.divider()
             
             pages = get_accessible_pages(st.session_state.user_role)
@@ -869,27 +967,51 @@ def main():
                 st.session_state.authenticated = False
                 st.rerun()
         
-        # Main content
-        if selected_page == "📊 Dashboard":
-            dashboard_page()
-        elif selected_page == "👥 Customers":
-            customers_page()
-        elif selected_page == "📦 Inventory":
-            inventory_page()
-        elif selected_page == "💰 Tax & Compliance":
-            tax_compliance_page()
-        elif selected_page == "📢 Campaigns":
-            campaigns_page()
-        elif selected_page == "💎 Chit Management":
-            chit_management_page()
-        elif selected_page == "⚡ Quick Actions":
-            quick_actions_page()
-        elif selected_page == "🤖 AI Assistant":
-            ai_assistant_page()
-        elif selected_page == "🤖 ML Models":
-            ml_models_page()
-        elif selected_page == "⚙️ Settings":
-            settings_page()
+        # Main content routing
+        if st.session_state.user_role == "Manager" or st.session_state.user_role == "Admin":
+            if selected_page == "📊 Dashboard":
+                dashboard_page()
+            elif selected_page == "👥 Customers":
+                customers_page()
+            elif selected_page == "📦 Inventory":
+                inventory_page()
+            elif selected_page == "💰 Tax & Compliance":
+                tax_compliance_page()
+            elif selected_page == "👨‍💼 Staff Management":
+                staff_management_page()
+            elif selected_page == "⚡ Quick Actions":
+                quick_actions_page()
+            elif selected_page == "🤖 AI Assistant":
+                ai_assistant_page()
+            elif selected_page == "⚙️ Settings":
+                settings_page()
+        
+        elif st.session_state.user_role == "Sales Staff":
+            if selected_page == "📊 Dashboard":
+                dashboard_page()
+            elif selected_page == "👥 Customers":
+                customers_page()
+            elif selected_page == "💾 Sales Record":
+                sales_record_page()
+            elif selected_page == "🎁 Loyalty Program":
+                st.subheader("💝 Loyalty Program Info")
+                st.info("Same loyalty program as customers. Earn points and help customers redeem!")
+            elif selected_page == "⚡ Quick Actions":
+                quick_actions_page()
+            elif selected_page == "🤖 AI Assistant":
+                ai_assistant_page()
+        
+        elif st.session_state.user_role == "Customer":
+            if selected_page == "🛍️ My Purchases":
+                customer_purchases_page()
+            elif selected_page == "💎 My Chits":
+                customer_chits_page()
+            elif selected_page == "🎁 Offers & Rewards":
+                customer_offers_page()
+            elif selected_page == "📊 My Summary":
+                customer_summary_page()
+            elif selected_page == "💬 Support Chat":
+                customer_support_chat()
 
 if __name__ == "__main__":
     main()
